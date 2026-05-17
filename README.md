@@ -70,7 +70,7 @@ Place the model inside: models/
 
 
 ## 📌 Future Improvements
-- Add disease treatment suggestions
+- disease treatment suggestions
 - Deploy on cloud
 - Improve model accuracy
 
