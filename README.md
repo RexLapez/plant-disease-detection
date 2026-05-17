@@ -46,7 +46,7 @@ plant_disease.json
 
 Due to GitHub size limits, the trained model is not included.
 
-👉 Download it from:
+👉 Download it from: https://drive.google.com/file/d/1brpoNptz2vY--59sIrrgzFLCp9a03nD1/view?usp=sharing
  
 
 Place the model inside: models/
