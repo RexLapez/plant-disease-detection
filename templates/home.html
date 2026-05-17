@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHASAL — Plant Disease Recognition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --green-950: #0b1f10;
+            --green-900: #132a1a;
+            --green-800: #1c4026;
+            --green-700: #255533;
+            --green-600: #2f6b41;
+            --green-500: #3d8752;
+            --green-400: #5aab6e;
+            --green-300: #82c994;
+            --green-200: #b3e0be;
+            --green-100: #d9f0e0;
+            --green-50:  #f0faf3;
+            --cream: #faf8f4;
+            --ink: #1a1a18;
+            --ink-muted: #4a4a42;
+            --ink-faint: #8a8a80;
+            --border: rgba(30,60,35,0.12);
+            --border-strong: rgba(30,60,35,0.22);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--cream);
+            color: var(--ink);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(250,248,244,0.85);
+            backdrop-filter: blur(14px);
+            border-bottom: 0.5px solid var(--border);
+            padding: 0 2rem;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--ink);
+        }
+
+        .nav-logo-circle {
+            width: 34px;
+            height: 34px;
+            background: var(--green-800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-logo-circle svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--green-200);
+        }
+
+        .nav-wordmark {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.15rem;
+            letter-spacing: 0.04em;
+            color: var(--green-900);
+        }
+
+        .nav-tag {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+        }
+
+        /* ── HERO ── */
+        .hero {
+            padding: 5rem 2rem 3rem;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--green-100);
+            color: var(--green-800);
+            font-size: 11.5px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 99px;
+            margin-bottom: 1.5rem;
+            border: 0.5px solid var(--green-300);
+        }
+
+        .hero-badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--green-500);
+            border-radius: 50%;
+        }
+
+        .hero h1 {
+            font-family: 'DM Serif Display', serif;
+            font-size: clamp(2.4rem, 5vw, 3.4rem);
+            line-height: 1.15;
+            color: var(--green-950);
+            margin-bottom: 1.1rem;
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--green-600);
+        }
+
+        .hero p {
+            font-size: 1.05rem;
+            font-weight: 300;
+            color: var(--ink-muted);
+            line-height: 1.7;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* ── UPLOAD CARD ── */
+        .upload-section {
+            max-width: 600px;
+            margin: 2.5rem auto 0;
+            padding: 0 1.5rem;
+        }
+
+        .upload-card {
+            background: #fff;
+            border: 0.5px solid var(--border-strong);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: 0 2px 24px rgba(0,0,0,0.05);
+        }
+
+        .drop-zone {
+            border: 1.5px dashed var(--green-300);
+            border-radius: var(--radius-lg);
+            background: var(--green-50);
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--green-500);
+            background: var(--green-100);
+        }
+
+        .drop-zone-icon {
+            width: 52px;
+            height: 52px;
+            background: var(--green-800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .drop-zone-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: var(--green-100);
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .drop-zone h3 {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--green-900);
+            margin-bottom: 0.3rem;
+        }
+
+        .drop-zone p {
+            font-size: 0.82rem;
+            color: var(--ink-faint);
+        }
+
+        .drop-zone p span {
+            color: var(--green-600);
+            font-weight: 500;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        #formFile {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-preview {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            background: var(--green-50);
+            border: 0.5px solid var(--green-200);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            margin-top: 1rem;
+        }
+
+        .file-preview.visible { display: flex; }
+
+        .file-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+            border: 0.5px solid var(--border);
+        }
+
+        .file-info { flex: 1; min-width: 0; }
+
+        .file-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--green-900);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-size {
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+        }
+
+        .file-remove {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--ink-faint);
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            transition: color 0.15s;
+        }
+
+        .file-remove:hover { color: #c0392b; }
+
+        .file-remove svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .btn-detect {
+            margin-top: 1.25rem;
+            width: 100%;
+            padding: 0.85rem 1.5rem;
+            background: var(--green-800);
+            color: var(--green-100);
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-detect:hover { background: var(--green-700); transform: translateY(-1px); }
+        .btn-detect:active { transform: translateY(0); }
+
+        .btn-detect svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .formats-note {
+            text-align: center;
+            margin-top: 0.85rem;
+            font-size: 0.78rem;
+            color: var(--ink-faint);
+        }
+
+        /* ── RESULT SECTION ── */
+        .result-section {
+            max-width: 760px;
+            margin: 3rem auto 4rem;
+            padding: 0 1.5rem;
+        }
+
+        .result-label {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 1rem;
+        }
+
+        .result-card {
+            background: #fff;
+            border: 0.5px solid var(--border-strong);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: 0 2px 24px rgba(0,0,0,0.05);
+        }
+
+        .result-header {
+            background: var(--green-950);
+            padding: 1.4rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .result-header-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--green-400);
+            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(90,171,110,0.5);
+        }
+
+        .result-header h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.3rem;
+            color: var(--green-100);
+            font-weight: 400;
+        }
+
+        .result-body {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 0;
+        }
+
+        @media (max-width: 580px) {
+            .result-body { grid-template-columns: 1fr; }
+        }
+
+        .result-image-wrap {
+            padding: 1.5rem;
+            border-right: 0.5px solid var(--border);
+        }
+
+        @media (max-width: 580px) {
+            .result-image-wrap { border-right: none; border-bottom: 0.5px solid var(--border); }
+        }
+
+        .result-image-wrap img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            border: 0.5px solid var(--border);
+        }
+
+        .result-details {
+            padding: 1.75rem 2rem;
+        }
+
+        .disease-name {
+            font-family: 'DM Serif Display', serif;
+            font-size: 1.55rem;
+            color: var(--green-900);
+            margin-bottom: 0.35rem;
+            line-height: 1.2;
+        }
+
+        .disease-name-raw {
+            font-size: 0.78rem;
+            color: var(--ink-faint);
+            font-family: 'DM Sans', sans-serif;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.03em;
+        }
+
+        .info-block {
+            margin-bottom: 1.4rem;
+        }
+
+        .info-block-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 0.45rem;
+        }
+
+        .info-block-label span {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .label-cause span { background: #fff0e6; border: 0.5px solid #f5c09a; }
+        .label-cure span { background: var(--green-100); border: 0.5px solid var(--green-300); }
+
+        .info-block p {
+            font-size: 0.92rem;
+            color: var(--ink-muted);
+            line-height: 1.65;
+        }
+
+        .divider {
+            height: 0.5px;
+            background: var(--border);
+            margin: 1.25rem 0;
+        }
+
+        /* ── FEATURES STRIP ── */
+        .features {
+            max-width: 600px;
+            margin: 0 auto 5rem;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 0.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .feature {
+            background: var(--cream);
+            padding: 1.2rem 1rem;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 1.4rem;
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .feature h4 {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--green-900);
+            margin-bottom: 0.2rem;
+        }
+
+        .feature p {
+            font-size: 0.73rem;
+            color: var(--ink-faint);
+            line-height: 1.4;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.78rem;
+            color: var(--ink-faint);
+            border-top: 0.5px solid var(--border);
+        }
+
+        /* ── LOADING STATE ── */
+        .btn-detect.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .btn-detect.loading .spinner { display: block; }
+        .btn-detect.loading .btn-icon { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a class="nav-brand" href="/">
+            <div class="nav-logo-circle">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C7 2 4 7 4 12c0 2 .5 3.5 1.5 5L12 22l6.5-5c1-1.5 1.5-3 1.5-5 0-5-3-10-8-10z"/>
+                </svg>
+            </div>
+            <span class="nav-wordmark">PHASAL</span>
+        </a>
+        <span class="nav-tag">AI Disease Detection</span>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-badge">
+            <div class="hero-badge-dot"></div>
+            Powered by deep learning
+        </div>
+        <h1>Diagnose your plant's <em>disease</em> instantly</h1>
+        <p>Upload a photo of any plant leaf and our model will identify the disease, its cause, and recommended treatments.</p>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="upload-section">
+        <div class="upload-card">
+            <form id="uploadForm" action="/upload/" method="POST" enctype="multipart/form-data">
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="formFile" name="img" accept="image/*" required>
+                    <div class="drop-zone-icon">
+                        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                    </div>
+                    <h3>Drop your leaf image here</h3>
+                    <p>or <span>browse files</span> from your device</p>
+                </div>
+
+                <div class="file-preview" id="filePreview">
+                    <img class="file-thumb" id="fileThumb" src="" alt="Preview">
+                    <div class="file-info">
+                        <div class="file-name" id="fileName">—</div>
+                        <div class="file-size" id="fileSize">—</div>
+                    </div>
+                    <button type="button" class="file-remove" id="fileRemove" aria-label="Remove file">
+                        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+
+                <button type="submit" class="btn-detect" id="submitBtn">
+                    <span class="spinner"></span>
+                    <svg class="btn-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M11 8v6M8 11h6"/></svg>
+                    Analyse Plant
+                </button>
+            </form>
+            <div class="formats-note">Accepts JPEG &amp; PNG · Max 5 MB</div>
+        </div>
+    </div>
+
+    <!-- RESULT -->
+    {% if result %}
+    <div class="result-section">
+        <div class="result-label">Analysis result</div>
+        <div class="result-card">
+            <div class="result-header">
+                <div class="result-header-dot"></div>
+                <h2>Prediction complete</h2>
+            </div>
+            <div class="result-body">
+                <div class="result-image-wrap">
+                    <img src="{{ imagepath }}" alt="Uploaded plant leaf">
+                </div>
+                <div class="result-details">
+                    <div class="disease-name">{{ prediction.name.replace('___', ' — ').replace('_', ' ') }}</div>
+                    <div class="disease-name-raw">{{ prediction.name }}</div>
+
+                    <div class="info-block label-cause">
+                        <div class="info-block-label">
+                            <span></span>
+                            Cause
+                        </div>
+                        <p>{{ prediction.cause }}</p>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="info-block label-cure">
+                        <div class="info-block-label">
+                            <span></span>
+                            Recommended treatment
+                        </div>
+                        <p>{{ prediction.cure }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- FEATURES -->
+    <div class="features">
+        <div class="feature">
+            <span class="feature-icon">🌿</span>
+            <h4>39 diseases</h4>
+            <p>Covers major crops &amp; conditions</p>
+        </div>
+        <div class="feature">
+            <span class="feature-icon">⚡</span>
+            <h4>Instant results</h4>
+            <p>Model inference in seconds</p>
+        </div>
+        <div class="feature">
+            <span class="feature-icon">💊</span>
+            <h4>Treatment tips</h4>
+            <p>Cause &amp; cure for every diagnosis</p>
+        </div>
+    </div>
+
+    <footer>
+        PHASAL · Plant Health &amp; AI Screening Lab — built with TensorFlow &amp; Flask
+    </footer>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const formFile = document.getElementById('formFile');
+        const filePreview = document.getElementById('filePreview');
+        const fileThumb = document.getElementById('fileThumb');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileRemove = document.getElementById('fileRemove');
+        const submitBtn = document.getElementById('submitBtn');
+        const uploadForm = document.getElementById('uploadForm');
+
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        function showPreview(file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                fileThumb.src = e.target.result;
+                fileName.textContent = file.name;
+                fileSize.textContent = formatBytes(file.size);
+                filePreview.classList.add('visible');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        formFile.addEventListener('change', () => {
+            if (formFile.files[0]) showPreview(formFile.files[0]);
+        });
+
+        fileRemove.addEventListener('click', () => {
+            formFile.value = '';
+            filePreview.classList.remove('visible');
+            fileThumb.src = '';
+        });
+
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                formFile.files = dt.files;
+                showPreview(file);
+            }
+        });
+
+        uploadForm.addEventListener('submit', () => {
+            submitBtn.classList.add('loading');
+            submitBtn.querySelector('span:last-child') && null;
+        });
+
+        // Scroll to result if present
+        window.addEventListener('load', () => {
+            const result = document.querySelector('.result-section');
+            if (result) result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    </script>
+</body>
+</html>
