@@ -58,13 +58,13 @@ Place the model inside: models/
 ![Homepage](Screenshots/Homepage.png)
 
 ### 📤 Upload Interface
-![Upload](Screenshots/Drag and drop select menu.png)
+![Upload](Screenshots/upload.png)
 
 ### 🔍 Prediction Result
 ![Result](Screenshots/Result.png)
 
 ### ⚠️ Edge Case (No Leaf)
-![No Leaf](Screenshots/Result with no leaf.png)
+![No Leaf](Screenshots/edge_case_no_leaf.png)
 
 
 
