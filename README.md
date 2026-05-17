@@ -64,7 +64,7 @@ Place the model inside: models/
 ![Result](Screenshots/Result.png)
 
 ### ⚠️ Edge Case (No Leaf)
-![No Leaf](Screenshots/edge_case_no_leaf.png)
+![No Leaf](Screenshots/Edge_case_no_leaf.png)
 
 
 
