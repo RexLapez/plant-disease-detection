@@ -65,7 +65,7 @@ Due to GitHub size limits, the trained model is not included.
 ![No Leaf](Screenshots/Edge_case_no_leaf.png)
 
 
-
+## Add Pesticide suggestion
 
 ## 📌 Future Improvements
 - disease treatment suggestions
