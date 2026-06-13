@@ -49,8 +49,6 @@ Due to GitHub size limits, the trained model is not included.
 👉 Download it from: https://drive.google.com/file/d/1brpoNptz2vY--59sIrrgzFLCp9a03nD1/view?usp=sharing
  
 
-Place the model inside: models/
-
 
 ## 📸 Screenshots
 
@@ -73,5 +71,6 @@ Place the model inside: models/
 - disease treatment suggestions
 - Deploy on cloud
 - Improve model accuracy
+- Suggest pesticides and chemicals based on the disease
 
 ---
